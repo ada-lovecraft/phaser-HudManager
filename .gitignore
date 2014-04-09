@@ -1,0 +1,10 @@
+node_modules/
+bower_components/phaser-official/docs/
+bower_components/phaser-official/examples/
+bower_components/phaser-official/filters/
+bower_components/phaser-official/labs/
+bower_components/phaser-official/resources/
+bower_components/phaser-official/src/
+bower_components/phaser-official/tasks/
+bower_components/phaser-official/tutorials/
+*.log
