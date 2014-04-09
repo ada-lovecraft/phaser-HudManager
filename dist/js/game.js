@@ -61,21 +61,33 @@ var Player = function(game, x, y, frame) {
   bmd.ctx.fillStyle = 'white';
   bmd.ctx.fill();
   bmd.render();
-  this.reloadMax = 50;
+
+  Phaser.Sprite.call(this, game, x, y, bmd);
+
+
+
+  this.ammoMax = 6;
+  this.ammo = 6;
   this.reloadCounter = 50;
   this.moveSpeed = 200;
   this.canReload = false;
+  this.fireRate = 300;
+  this.fireTimer = 0;
+  
 
-  Phaser.Sprite.call(this, game, x, y, bmd);
+
+  this.reloadTimer = this.game.time.create(false);
+  
+
   this.anchor.setTo(0.5, 0.5);
   this.game.physics.arcade.enableBody(this);
   this.body.collideWorldBounds = true;
 
   this.hud = Phaser.Plugin.HUDManager.get('gamehud');
-  this.reloader = this.hud.addBar(0,-12, 16, 2, this.reloadMax, 'reloadCounter', this, '#ffbd55');
-  this.reloader.bar.anchor.setTo(0.5, 0.5);
+  this.ammoHUD = this.hud.addBar(0,-12, 16, 2, this.ammoMax, 'ammo', this, '#ffbd55');
+  this.ammoHUD.bar.anchor.setTo(0.5, 0.5);
   
-  this.addChild(this.reloader.bar);
+  this.addChild(this.ammoHUD.bar);
 
   this.leftKey = this.game.input.keyboard.addKey(Phaser.Keyboard.A);
   this.rightKey = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -83,6 +95,7 @@ var Player = function(game, x, y, frame) {
   this.downKey = this.game.input.keyboard.addKey(Phaser.Keyboard.S);
   this.fireSound = this.game.add.audio('gunshot');
   this.reloadSound = this.game.add.audio('reloadSound');
+  this.emptySound = this.game.add.audio('empty');
 
 };
 
@@ -107,19 +120,40 @@ Player.prototype.update = function() {
     this.body.velocity.y = -this.moveSpeed;
   }
 
-  if(this.reloadCounter < this.reloadMax) {
-    this.reloadCounter++;
-  }
-  if (this.reloadCounter === 20  ) {
-    console.debug('playing reload sound', this.reloadSound);
-    this.reloadSound.play();
-    
+};
+Player.prototype.canFire = function() {
+  if(this.reloadTimer.running) {
+    if(this.fireTimer <= this.game.time.now) {
+      this.emptySound.play();
+      this.fireTimer = this.fireRate + this.game.time.now;
+    }
+    return false;
+  } else {
+    return this.fireTimer <= this.game.time.now;
   }
 };
 
+
+Player.prototype.addAmmo = function() {
+  this.ammo++;
+  if (this.ammo === this.ammoMax - 1) {
+    this.reloadSound.play();
+  }
+  if (this.ammo === this.ammoMax) {
+    this.ammoHUD.bar.alpha = 1;
+    this.reloadTimer.stop(true);
+    this.fireTimer = this.game.time.now;
+  }
+};
 Player.prototype.fire = function() {
-  this.reloadCounter = 0;
+  this.ammo--;
+  if (this.ammo === 0) {
+    this.ammoHUD.bar.alpha = 0.75;
+    this.reloadTimer.repeat(Phaser.Timer.SECOND * 0.5, this.ammoMax, this.addAmmo, this);
+    this.reloadTimer.start();
+  }
   this.fireSound.play();
+  this.fireTimer = this.fireRate + this.game.time.now;
 };
 
 module.exports = Player;
@@ -285,7 +319,7 @@ Menu.prototype = {
     
   },
   fire: function() {
-    if(this.player.reloadCounter >= this.player.reloadMax) {
+    if(this.player.canFire()) {
       var bullet = this.bullets.getFirstExists(false);
       if(!bullet) {
         bullet = this.bullets.add(this.game.add.sprite(0,0, this.bulletBMD));
@@ -358,6 +392,8 @@ Preload.prototype = {
     this.load.script('HudManager', 'js/plugins/HUDManager.js');
     this.load.audio('reloadSound', 'assets/gun-cocking-01.wav');
     this.load.audio('gunshot', 'assets/gunshot.wav');
+    this.load.audio('empty', 'assets/empty.wav');
+
 
   },
   create: function() {

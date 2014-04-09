@@ -16,6 +16,8 @@ Preload.prototype = {
     this.load.script('HudManager', 'js/plugins/HUDManager.js');
     this.load.audio('reloadSound', 'assets/gun-cocking-01.wav');
     this.load.audio('gunshot', 'assets/gunshot.wav');
+    this.load.audio('empty', 'assets/empty.wav');
+
 
   },
   create: function() {

@@ -95,7 +95,7 @@ Menu.prototype = {
     
   },
   fire: function() {
-    if(this.player.reloadCounter >= this.player.reloadMax) {
+    if(this.player.canFire()) {
       var bullet = this.bullets.getFirstExists(false);
       if(!bullet) {
         bullet = this.bullets.add(this.game.add.sprite(0,0, this.bulletBMD));
