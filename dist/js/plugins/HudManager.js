@@ -4,7 +4,7 @@
 */
 function initWatchVal() {}
 
-Phaser.Plugin.HudManager = function (game, parent, name, pollRate) {
+Phaser.Plugin.HUDManager = function (game, parent, name, pollRate) {
 
   Phaser.Plugin.call(this, game, parent);
 
@@ -13,13 +13,13 @@ Phaser.Plugin.HudManager = function (game, parent, name, pollRate) {
   this.digestTimer.timer.start();
   this.$$watchers = [];
   this.$$lastDirtyWatch = null;
-  this.name = name || Phaser.Plugin.HudManager.hudCounter++;
+  this.name = name || Phaser.Plugin.HUDManager.hudCounter++;
 };
 
-Phaser.Plugin.HudManager.huds = {};
-Phaser.Plugin.HudManager.hudCounter = 0;
+Phaser.Plugin.HUDManager.huds = {};
+Phaser.Plugin.HUDManager.hudCounter = 0;
 
-Phaser.Plugin.HudManager.HEALTHBAR = function(percent) {
+Phaser.Plugin.HUDManager.HEALTHBAR = function(percent) {
   if (percent <= 0.25) {
     return '#ff7474'; //red
   }
@@ -30,24 +30,25 @@ Phaser.Plugin.HudManager.HEALTHBAR = function(percent) {
 };
 
 
-Phaser.Plugin.HudManager.prototype = Object.create(Phaser.Plugin.prototype);
-Phaser.Plugin.HudManager.prototype.constructor = Phaser.Plugin.HudManager;
+Phaser.Plugin.HUDManager.prototype = Object.create(Phaser.Plugin.prototype);
+Phaser.Plugin.HUDManager.prototype.constructor = Phaser.Plugin.HUDManager;
 
 
 
-Phaser.Plugin.HudManager.create = function(game, parent, name, pollrate) {
-    var hud = Phaser.Plugin.HudManager.huds[name];
-    if(!!hud) {
-      return hud;
-    }
-    name = name || Phaser.Plugin.HudManager.hudCounter++;
-    hud = new Phaser.Plugin.HudManager(game, parent, name, pollrate);
-    Phaser.Plugin.HudManager.huds[name] = hud;
+Phaser.Plugin.HUDManager.create = function(game, parent, name, pollrate) {
+
+  var hud = Phaser.Plugin.HUDManager.huds[name];
+  if(!!hud) {
     return hud;
+  }
+  name = name || Phaser.Plugin.HUDManager.hudCounter++;
+  hud = new Phaser.Plugin.HUDManager(game, parent, name, pollrate);
+  Phaser.Plugin.HUDManager.huds[name] = hud;
+  return hud;
 };
 
-Phaser.Plugin.HudManager.get = function(name) {
-    var hud = Phaser.Plugin.HudManager.huds[name];
+Phaser.Plugin.HUDManager.get = function(name) {
+    var hud = Phaser.Plugin.HUDManager.huds[name];
     if(hud) {
       return hud;
     } else {
@@ -56,12 +57,12 @@ Phaser.Plugin.HudManager.get = function(name) {
 };
 
 
-Phaser.Plugin.HudManager.prototype.destroy = function() {
- delete Phaser.Plugin.HudManager.huds[this.name];
+Phaser.Plugin.HUDManager.prototype.destroy = function() {
+ delete Phaser.Plugin.HUDManager.huds[this.name];
  this.$$watchers = [];
 };
 
-Phaser.Plugin.HudManager.prototype.$watch = function(watchFn, listenerFn) {
+Phaser.Plugin.HUDManager.prototype.$watch = function(watchFn, listenerFn) {
   var watcher = {
     watchFn: watchFn,
     listenerFn: listenerFn || function() {},
@@ -80,7 +81,7 @@ Phaser.Plugin.HudManager.prototype.$watch = function(watchFn, listenerFn) {
 
 
 
-Phaser.Plugin.HudManager.prototype.$digestOnce = function() {
+Phaser.Plugin.HUDManager.prototype.$digestOnce = function() {
   var newValue, oldValue, dirty;
   this.$$watchers.forEach(function(watcher) {
     newValue = watcher.watchFn(this);
@@ -97,7 +98,7 @@ Phaser.Plugin.HudManager.prototype.$digestOnce = function() {
   return dirty;
 };
 
-Phaser.Plugin.HudManager.prototype.$digest = function() {
+Phaser.Plugin.HUDManager.prototype.$digest = function() {
   var ttl = 10;
   
   var self = this;
@@ -116,7 +117,7 @@ Phaser.Plugin.HudManager.prototype.$digest = function() {
     
 };
 
-Phaser.Plugin.HudManager.prototype.addText = function(x, y, label, style, watched, context) {
+Phaser.Plugin.HUDManager.prototype.addText = function(x, y, label, style, watched, context) {
   var text = this.game.add.text(x, y, label, style);
   context = context || window;
   var dereg = this.$watch(function() {
@@ -127,14 +128,9 @@ Phaser.Plugin.HudManager.prototype.addText = function(x, y, label, style, watche
   return {text: text, deregister: dereg};
 };
 
-Phaser.Plugin.HudManager.prototype.addBar = function(x, y, width, height, max, watched, context, color, backgroundColor, shouldCountUp ) {
+Phaser.Plugin.HUDManager.prototype.addBar = function(x, y, width, height, max, watched, context, color, backgroundColor) {
   max = max || 100;
-  if(typeof backgroundColor === 'boolean') {
-    shouldCountUp = backgroundColor;
-    backgroundColor = null;
-  }
 
-  shouldCountUp = shouldCountUp !== null ? shouldCountUp : true; 
   color = color || 'white';
   backgroundColor = backgroundColor || '#999';
 
@@ -152,7 +148,7 @@ Phaser.Plugin.HudManager.prototype.addBar = function(x, y, width, height, max, w
     return context[watched];
   }, function(newVal) {
     var percent = newVal / max;
-    if((percent <= 1 && shouldCountUp) || (percent >= 0 && !shouldCountUp)) {
+    if((percent <= 1 && percent >= 0)) {
       bmd.clear();
       bmd.ctx.beginPath();
       bmd.ctx.moveTo(0,0);
@@ -174,7 +170,7 @@ Phaser.Plugin.HudManager.prototype.addBar = function(x, y, width, height, max, w
 };
 
 
-Phaser.Plugin.HudManager.prototype.addWatch = function(watched, watchedContext, callback, callbackContext) {
+Phaser.Plugin.HUDManager.prototype.addWatch = function(watched, watchedContext, callback, callbackContext) {
   watchedContext = watchedContext || window;
   callbackContext = callbackContext || window;
   var dereg = this.$watch(function() {

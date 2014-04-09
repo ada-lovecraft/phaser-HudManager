@@ -15,8 +15,8 @@ var Enemy = function(game, x, y, frame) {
   this.health = 5;
   this.alive = true;
 
-  this.hud = Phaser.Plugin.HudManager.get('gamehud');
-  this.healthHUD = this.hud.addBar(0,-20, 32, 2, this.maxHealth, 'health', this, Phaser.Plugin.HudManager.HEALTHBAR, false);
+  this.hud = Phaser.Plugin.HUDManager.create(this.game, this, 'enemyhud');
+  this.healthHUD = this.hud.addBar(0,-20, 32, 2, this.maxHealth, 'health', this, Phaser.Plugin.HUDManager.HEALTHBAR, false);
   this.healthHUD.bar.anchor.setTo(0.5, 0.5);
   this.addChild(this.healthHUD.bar);
 

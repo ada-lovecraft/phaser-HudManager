@@ -1,23 +1,24 @@
 'use strict';
 
 var Player = function(game, x, y, frame) {
-  var bmd = game.add.bitmapData(32,32);
+  var bmd = game.add.bitmapData(16,16);
   bmd.ctx.beginPath();
-  bmd.ctx.rect(0,0, 32,32);
+  bmd.ctx.rect(0,0, 16,16);
   bmd.ctx.fillStyle = 'white';
   bmd.ctx.fill();
   bmd.render();
   this.reloadMax = 50;
   this.reloadCounter = 50;
-  this.moveSpeed = 100;
+  this.moveSpeed = 200;
+  this.canReload = false;
 
   Phaser.Sprite.call(this, game, x, y, bmd);
   this.anchor.setTo(0.5, 0.5);
   this.game.physics.arcade.enableBody(this);
   this.body.collideWorldBounds = true;
 
-  this.hud = Phaser.Plugin.HudManager.get('gamehud');
-  this.reloader = this.hud.addBar(0,-20, 32, 2, this.reloadMax, 'reloadCounter', this, '#ffbd55');
+  this.hud = Phaser.Plugin.HUDManager.get('gamehud');
+  this.reloader = this.hud.addBar(0,-12, 16, 2, this.reloadMax, 'reloadCounter', this, '#ffbd55');
   this.reloader.bar.anchor.setTo(0.5, 0.5);
   
   this.addChild(this.reloader.bar);
@@ -26,6 +27,8 @@ var Player = function(game, x, y, frame) {
   this.rightKey = this.game.input.keyboard.addKey(Phaser.Keyboard.D);
   this.upKey = this.game.input.keyboard.addKey(Phaser.Keyboard.W);
   this.downKey = this.game.input.keyboard.addKey(Phaser.Keyboard.S);
+  this.fireSound = this.game.add.audio('gunshot');
+  this.reloadSound = this.game.add.audio('reloadSound');
 
 };
 
@@ -53,10 +56,16 @@ Player.prototype.update = function() {
   if(this.reloadCounter < this.reloadMax) {
     this.reloadCounter++;
   }
+  if (this.reloadCounter === 20  ) {
+    console.debug('playing reload sound', this.reloadSound);
+    this.reloadSound.play();
+    
+  }
 };
 
 Player.prototype.fire = function() {
   this.reloadCounter = 0;
+  this.fireSound.play();
 };
 
 module.exports = Player;

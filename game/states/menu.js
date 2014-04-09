@@ -14,7 +14,7 @@ Menu.prototype = {
 
   },
   create: function() {
-    this.hud = Phaser.Plugin.HudManager.create(this.game, this, 'gamehud');
+    this.hud = Phaser.Plugin.HUDManager.create(this.game, this, 'gamehud');
 
     this.player = new Player(this.game, this.game.width/2, this.game.height/2);
     this.game.add.existing(this.player);
