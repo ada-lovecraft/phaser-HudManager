@@ -53,6 +53,7 @@ By default, the poll rate is once every 100ms. This means the hud dirty checks t
   * `label`: (string) the string to prepend to the Phaser.Text object
   * `watched`: (string) the name of the variable to watch in the given context
   * `context`: (object) the context of the watched variabled
+
 ##### returns: 
 { text: Phaser.Text, deregister: Function }
 Calling the deregistration function will cause the HUDManager instance to stop updating on changes
@@ -69,6 +70,7 @@ Adds a progress/health bar.
   * `context`: (object) the context of the watched variabled
   * `color`: (string | function) the color of the created bar. You can provide a function that accepts (percent) as an argument. Percent will be a value between 0 and 1 indicating how much of the bar is filled. The function must return a string that represents a color. DEFAULT: 'white'
   * 'backgroundColor': (string) A string representing a color. DEFAULT: '#999'
+
 ##### returns: 
 { bar: Phaser.Sprite, deregister: Function }
 Calling the deregistration function will cause the HUDManager instance to stop updating on changes
@@ -83,5 +85,6 @@ This is a predefined function that you can pass as the `color` argument in `HUDM
   * `watchedContext`: (object) the context of the watched variabled
   * `callback`: (Function(newValue, oldValue)) callback to call when a change has been detected
   * `callbackContext`: (object) the context of the callback function
-  ##### returns: Function
+
+##### returns: Function
   The returned function is the deregistration function. Calling this function will stop the HUDManager instance from watching for changes on this watched item.
